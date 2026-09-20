@@ -14,7 +14,7 @@ export function AppButton({ children, onClick, type = "button", disabled, classN
 
 export function FloatingParticles({ celebration = false }: { celebration?: boolean }) {
   const reduced = useReducedMotion();
-  return <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">{Array.from({ length: celebration ? 22 : 10 }).map((_, i) => <motion.span key={i} className={`absolute ${i % 3 ? "particle-dot" : "particle-heart"}`} style={{ left: `${(i * 37) % 96}%`, top: `${(i * 53) % 92}%` }} animate={reduced ? undefined : { y: [0, -12 - (i % 4) * 6, 0], x: [0, i % 2 ? 8 : -8, 0], opacity: celebration ? [0, .75, 0] : [.15, .45, .15], rotate: [0, 15, 0] }} transition={{ duration: celebration ? 2.5 + (i % 3) : 7 + (i % 5), repeat: Infinity, delay: i * .12 }} />)}</div>;
+  return <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">{Array.from({ length: celebration ? 22 : 10 }).map((_, i) => <motion.span key={i} className={`absolute ${i % 3 ? "particle-dot" : "particle-heart"}`} style={{ left: `${(i * 37) % 96}%`, top: `${(i * 53) % 92}%` }} animate={reduced ? {} : { y: [0, -12 - (i % 4) * 6, 0], x: [0, i % 2 ? 8 : -8, 0], opacity: celebration ? [0, .75, 0] : [.15, .45, .15], rotate: [0, 15, 0] }} transition={{ duration: celebration ? 2.5 + (i % 3) : 7 + (i % 5), repeat: Infinity, delay: i * .12 }} />)}</div>;
 }
 
 export function MusicToggle() {
