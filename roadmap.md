@@ -6,5 +6,5 @@
 - [x] Verify mobile, desktop, uploads, transitions, replay, and console health
 - [x] Add uploaded and original cute stickers throughout the experience
 - [x] Verify sticker placement on mobile and desktop
-- [ ] Add persisted settings panel for nickname, apology, and balloon text
-- [ ] Verify settings editing, validation, persistence, and responsive layout
+- [x] Add persisted settings panel for nickname, apology, and balloon text
+- [x] Verify settings editing, validation, persistence, and responsive layout
