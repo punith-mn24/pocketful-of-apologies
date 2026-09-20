@@ -26,6 +26,7 @@ export type Personalization = {
   senderName: string;
   note: string;
   photos: string[];
+  balloonMessages: string[];
 };
 
 export const defaultPersonalization: Personalization = {
@@ -34,4 +35,5 @@ export const defaultPersonalization: Personalization = {
   senderName: "",
   note: "",
   photos: [],
+  balloonMessages: [...surpriseConfig.balloonMessages],
 };

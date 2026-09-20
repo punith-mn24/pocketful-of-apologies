@@ -10,7 +10,17 @@ export function usePersistentPersonalization() {
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored) setValue({ ...defaultPersonalization, ...JSON.parse(stored) });
+      if (stored) {
+        const parsed = JSON.parse(stored) as Partial<Personalization>;
+        setValue({
+          ...defaultPersonalization,
+          ...parsed,
+          photos: Array.isArray(parsed.photos) ? parsed.photos : [],
+          balloonMessages: Array.isArray(parsed.balloonMessages) && parsed.balloonMessages.length
+            ? parsed.balloonMessages
+            : [...defaultPersonalization.balloonMessages],
+        });
+      }
     } catch {
       // The experience remains usable if storage is unavailable.
     }
