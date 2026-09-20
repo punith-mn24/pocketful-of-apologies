@@ -180,6 +180,7 @@
 .wax-seal { position: absolute; z-index: 6; left: 50%; top: 45%; display: grid; width: 3rem; height: 3rem; transform: translate(-50%, -50%); place-items: center; border-radius: 999px; background: var(--wine); color: var(--cream); }
 .particle-dot { width: .35rem; height: .35rem; border-radius: 999px; background: var(--rose); }
 .particle-heart::before { content: "♥"; color: color-mix(in oklab, var(--rose-deep) 35%, transparent); font-size: 1rem; }
+.cute-sticker { filter: drop-shadow(0 .75rem 1rem color-mix(in oklab, var(--wine) 14%, transparent)); }
 .balloon { position: relative; display: block; width: clamp(5rem, 9vw, 7rem); height: clamp(6.5rem, 12vw, 9rem); border-radius: 50% 50% 46% 46%; background: var(--rose); box-shadow: inset -16px -12px 22px color-mix(in oklab, var(--wine) 20%, transparent); }
 .balloon::after { content: ""; position: absolute; bottom: -.45rem; left: 50%; border: .45rem solid transparent; border-bottom: 0; border-top-color: inherit; transform: translateX(-50%); }
 .balloon-1 { background: var(--rose-deep); }.balloon-2 { background: var(--blush); }.balloon-3 { background: color-mix(in oklab, var(--wine) 78%, var(--rose)); }

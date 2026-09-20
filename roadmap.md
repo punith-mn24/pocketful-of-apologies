@@ -4,3 +4,5 @@
 - [x] Add local persistence, photo validation, and audio controls
 - [x] Add responsive motion, touch interactions, and accessibility
 - [x] Verify mobile, desktop, uploads, transitions, replay, and console health
+- [x] Add uploaded and original cute stickers throughout the experience
+- [x] Verify sticker placement on mobile and desktop
