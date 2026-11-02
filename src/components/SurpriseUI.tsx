@@ -9,6 +9,7 @@ import ratHeartSticker from "../assets/rat-heart-sticker.png";
 import tulipRibbonSticker from "../assets/tulip-ribbon-sticker.png";
 import { surpriseConfig, type Personalization } from "../config/surprise";
 import { playTone, startAmbient } from "../utils/audio";
+import { AiDraftHelper } from "./AiDraftHelper";
 
 export type Screen = "landing" | "envelope" | "letter" | "photos" | "balloons" | "final";
 
@@ -52,6 +53,7 @@ export function SettingsPanel({ open, data, setData, onClose }: { open: boolean;
     <motion.aside role="dialog" aria-modal="true" aria-labelledby="settings-title" className="fixed inset-y-0 right-0 z-[60] flex w-full max-w-lg flex-col bg-cream shadow-2xl shadow-ink/20" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 30, stiffness: 280 }}>
       <div className="flex items-start justify-between border-b border-ink/10 px-5 py-5 sm:px-7"><div><p className="eyebrow">Make it theirs</p><h2 id="settings-title" className="mt-2 font-display text-3xl">Surprise settings</h2></div><button type="button" onClick={onClose} aria-label="Close settings" className="focus-ring grid size-11 shrink-0 place-items-center rounded-full border border-ink/10 text-ink-soft"><X size={19} /></button></div>
       <div className="flex-1 space-y-8 overflow-y-auto px-5 py-6 sm:px-7">
+        <AiDraftHelper defaultName={displayNickname} balloonCount={draft.balloonMessages.length} onDraft={(note, balloons) => setDraft(d => ({ ...d, note, balloonMessages: d.balloonMessages.map((m, i) => balloons[i] ?? m) }))} />
         <fieldset><legend className="mb-3 font-display text-xl">What do you call them?</legend><div className="flex flex-wrap gap-2">{surpriseConfig.nicknames.map(nickname => <button type="button" key={nickname} aria-pressed={draft.nickname === nickname} onClick={() => setDraft({ ...draft, nickname })} className={`focus-ring min-h-11 rounded-full border px-4 text-sm transition-colors ${draft.nickname === nickname ? "border-rose-deep bg-rose-deep text-cream" : "border-ink/10 bg-background text-ink-soft"}`}>{nickname}</button>)}</div></fieldset>
         <AnimatePresence>{draft.nickname === "Custom" && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><label className="field-label" htmlFor="settings-nickname">Nickname</label><input id="settings-nickname" className="field" value={draft.customNickname} maxLength={30} onChange={event => setDraft({ ...draft, customNickname: event.target.value })} placeholder="The name only you two use" autoFocus /></motion.div>}</AnimatePresence>
         <div><div className="mb-2 flex items-end justify-between"><label className="field-label mb-0" htmlFor="settings-note">Birthday message</label><span className="text-xs tabular-nums text-ink-soft">{draft.note.length} / {surpriseConfig.maxNoteLength}</span></div><textarea id="settings-note" rows={7} className="field resize-none" maxLength={surpriseConfig.maxNoteLength} value={draft.note} onChange={event => setDraft({ ...draft, note: event.target.value })} placeholder="Write the birthday wish you’ve been meaning to say…" /></div>
