@@ -10,7 +10,7 @@ export function AiDraftHelper({ defaultName, balloonCount, onDraft }: { defaultN
   const [name, setName] = useState(defaultName);
   const [personality, setPersonality] = useState("");
   const [memories, setMemories] = useState("");
-  const [tone, setTone] = useState<DraftInput["tone"]>(tones[0]);
+  const [tone, setTone] = useState<DraftInput["tone"]>("Sweet & heartfelt");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ kind: "error" | "ok"; text: string } | null>(null);
 
