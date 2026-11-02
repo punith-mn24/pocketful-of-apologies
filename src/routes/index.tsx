@@ -7,10 +7,10 @@ import { usePersistentPersonalization } from "../hooks/usePersistentPersonalizat
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
-    { title: "A Birthday Surprise For You — An Interactive Celebration" },
-    { name: "description", content: "Create a cute, colorful birthday surprise for a friend — a letter, memories, and balloons to pop." },
-    { property: "og:title", content: "A Birthday Surprise For You" },
-    { property: "og:description", content: "A cute interactive birthday surprise made by a friend, for a friend." },
+    { title: "Aesthetic Birthday Surprise 🌷 — A Little Something For You" },
+    { name: "description", content: "Create an aesthetic pink floral birthday card & interactive surprise — handwritten letter, memories, and floating balloons to pop." },
+    { property: "og:title", content: "Aesthetic Birthday Surprise 🌷" },
+    { property: "og:description", content: "An aesthetic interactive birthday surprise made with pink tulips, bows, and love." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ]}),
@@ -29,8 +29,32 @@ function Index() {
     <div className="mesh-bg relative min-h-screen overflow-x-hidden">
       <FloatingParticles />
       <header className="relative z-30 flex h-20 items-center justify-between px-5 sm:px-10">
-        <div className="flex items-center gap-3"><span className="grid size-9 place-items-center rounded-full bg-rose-deep text-cream">🎈</span><div><p className="text-[10px] uppercase tracking-[.28em] text-ink-soft">Made by a friend</p><p className="font-display text-lg leading-none">Birthday Surprise</p></div></div>
-        <div className="flex items-center gap-2"><button type="button" onClick={() => setSettingsOpen(true)} aria-label="Open surprise settings" title="Surprise settings" className="focus-ring grid size-11 place-items-center rounded-full border border-ink/10 bg-cream/75 text-ink-soft backdrop-blur-md"><Settings size={17} /></button><button type="button" onClick={() => setSound(!sound)} className="focus-ring hidden min-h-11 rounded-full border border-ink/10 bg-cream/75 px-4 text-xs text-ink-soft sm:block">Sounds {sound ? "on" : "off"}</button><MusicToggle /></div>
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 place-items-center rounded-full bg-rose-deep text-cream text-lg shadow-sm">🌷</span>
+          <div>
+            <p className="text-[10px] uppercase tracking-[.28em] text-ink-soft">Straight from the heart</p>
+            <p className="font-display text-lg font-bold leading-none text-ink">Happy Birthday</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSettingsOpen(true)}
+            aria-label="Open surprise settings"
+            title="Surprise settings"
+            className="focus-ring grid size-11 place-items-center rounded-full border border-ink/10 bg-cream/80 text-ink-soft backdrop-blur-md hover:text-ink hover:border-ink/20 transition-colors"
+          >
+            <Settings size={17} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSound(!sound)}
+            className="focus-ring hidden min-h-11 rounded-full border border-ink/10 bg-cream/80 px-4 text-xs font-medium text-ink-soft backdrop-blur-md sm:block hover:text-ink transition-colors"
+          >
+            Sounds {sound ? "on 🔔" : "off 🔕"}
+          </button>
+          <MusicToggle />
+        </div>
       </header>
       <AnimatePresence mode="wait">
         {screen === "landing" && <ScreenTransition screen={screen}><LandingScreen data={value} setData={setValue} onOpenSettings={() => setSettingsOpen(true)} onCreate={() => changeScreen("envelope")} /></ScreenTransition>}

@@ -13,7 +13,7 @@ export type DraftInput = z.infer<typeof inputSchema>;
 export type DraftResult = { note: string; balloonMessages: string[] } | { error: string };
 
 export const draftBirthdayMessage = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => inputSchema.parse(data))
+  .validator((data: unknown) => inputSchema.parse(data))
   .handler(async ({ data }): Promise<DraftResult> => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { error: "AI writing isn't set up yet." };
@@ -47,3 +47,4 @@ export const draftBirthdayMessage = createServerFn({ method: "POST" })
       return { error: "Couldn't write a draft right now. Please try again." };
     }
   });
+

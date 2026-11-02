@@ -70,7 +70,8 @@
   --color-mint: var(--mint);
   --color-sky: var(--sky);
   --color-lilac: var(--lilac);
-  --font-display: "Baloo 2", "Comic Sans MS", cursive;
+  --font-display: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --font-handwriting: "Caveat", "Dancing Script", cursive;
   --font-body: "Nunito", sans-serif;
 }
 
@@ -200,3 +201,41 @@
 .film-grain { pointer-events: none; position: absolute; inset: 0; border-radius: 1rem; opacity: .13; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+
+.font-handwriting { font-family: var(--font-handwriting), "Caveat", cursive; }
+.aesthetic-card-frame {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 1.75rem;
+  overflow: hidden;
+  box-shadow: 0 25px 60px -15px rgba(222, 93, 131, 0.28), 0 10px 25px -5px rgba(44, 34, 36, 0.1);
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  background: #FFFDF9;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+.aesthetic-card-frame:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 32px 75px -15px rgba(222, 93, 131, 0.35), 0 15px 30px -5px rgba(44, 34, 36, 0.14);
+}
+.twinkle-star {
+  display: inline-block;
+  color: #F4A7B9;
+  text-shadow: 0 0 8px rgba(244, 167, 185, 0.85);
+  animation: starTwinkle 3s ease-in-out infinite;
+}
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.45; transform: scale(0.85) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(12deg); }
+}
+.washi-tape {
+  position: absolute;
+  height: 1.35rem;
+  width: 5rem;
+  background: rgba(254, 215, 226, 0.78);
+  backdrop-filter: blur(2px);
+  border-left: 2px dashed rgba(251, 143, 166, 0.6);
+  border-right: 2px dashed rgba(251, 143, 166, 0.6);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
