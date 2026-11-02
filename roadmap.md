@@ -8,3 +8,5 @@
 - [x] Verify sticker placement on mobile and desktop
 - [x] Add persisted settings panel for nickname, apology, and balloon text
 - [x] Verify settings editing, validation, persistence, and responsive layout
+- [x] Retheme as a cute, colorful birthday surprise for friends (palette, fonts, copy)
+- [ ] Verify birthday retheme on mobile and desktop
