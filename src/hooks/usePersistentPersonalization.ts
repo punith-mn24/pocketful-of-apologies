@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { defaultPersonalization, type Personalization } from "../config/surprise";
 
-const STORAGE_KEY = "little-letter-personalization";
+const STORAGE_KEY = "birthday-surprise-personalization";
 
 export function usePersistentPersonalization() {
   const [value, setValue] = useState<Personalization>(defaultPersonalization);

@@ -1,20 +1,20 @@
 export const surpriseConfig = {
-  nicknames: ["Babe", "Jaan", "Love", "My Girl", "Baby", "Sunshine", "Custom"],
+  nicknames: ["Bestie", "Buddy", "Superstar", "Partner in Crime", "Sunshine", "Birthday Star", "Custom"],
   balloonMessages: [
-    "Thank you for being you.",
-    "You make my days better.",
-    "You’re genuinely special to me.",
-    "Some memories never get old.",
-    "I’m lucky to have you.",
-    "Here’s to more moments together.",
-    "A little something, just because.",
+    "You make every day more fun.",
+    "Thanks for always having my back.",
+    "You’re one in a million.",
+    "Our memories are my favorite.",
+    "So lucky to call you my friend.",
+    "Here’s to more adventures together.",
+    "A little something, just for your big day.",
   ],
   memoryMessages: [
     "Some moments are worth keeping.",
-    "Some people make ordinary days feel special.",
+    "Some friends make ordinary days feel special.",
   ],
-  finalLead: "I’m really sorry.",
-  finalThanks: "Thank you for hearing me out.",
+  finalLead: "Happy Birthday!",
+  finalThanks: "So glad we’re friends.",
   maxNoteLength: 600,
   maxPhotos: 2,
   maxPhotoBytes: 1_500_000,
@@ -30,7 +30,7 @@ export type Personalization = {
 };
 
 export const defaultPersonalization: Personalization = {
-  nickname: "Jaan",
+  nickname: "Bestie",
   customNickname: "",
   senderName: "",
   note: "",
