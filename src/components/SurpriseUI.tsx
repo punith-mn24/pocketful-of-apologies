@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowRight, ImagePlus, Music, Music2, RotateCcw, Save, Settings, Sparkles, X, Heart } from "lucide-react";
+import { ArrowRight, Check, Copy, ImagePlus, Music, Music2, RotateCcw, Save, Settings, Share2, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import blushingCatSticker from "../assets/blushing-cat-sticker.png";
 import catTulipsSticker from "../assets/cat-tulips-sticker.png";
@@ -10,6 +10,7 @@ import tulipRibbonSticker from "../assets/tulip-ribbon-sticker.png";
 import pinterestRef from "../assets/pinterest-ref.jpg";
 import { surpriseConfig, type Personalization } from "../config/surprise";
 import { playTone, startAmbient } from "../utils/audio";
+import { encodePersonalizationToUrl } from "../utils/share";
 import { AiDraftHelper } from "./AiDraftHelper";
 
 export type Screen = "landing" | "envelope" | "letter" | "photos" | "balloons" | "final";
@@ -23,6 +24,126 @@ function CuteSticker({ src, alt, className = "", delay = 0 }: { src: string; alt
 
 export function AppButton({ children, onClick, type = "button", disabled, className = "" }: { children: ReactNode; onClick?: () => void; type?: "button" | "submit"; disabled?: boolean; className?: string }) {
   return <button type={type} disabled={disabled} onClick={onClick} className={`focus-ring inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-7 py-3 text-sm font-semibold text-cream shadow-lg shadow-ink/10 transition-[transform,opacity] active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-45 ${className}`}>{children}</button>;
+}
+
+export function ShareCard({ data }: { data: Personalization }) {
+  const [copied, setCopied] = useState(false);
+  const [autoOpen, setAutoOpen] = useState(true);
+  const [shareUrl, setShareUrl] = useState("");
+
+  useEffect(() => {
+    setShareUrl(encodePersonalizationToUrl(data, autoOpen));
+  }, [data, autoOpen]);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    } catch {
+      // Fallback
+    }
+  };
+
+  const shareNative = async () => {
+    const displayNickname = data.nickname === "Custom" ? data.customNickname : data.nickname;
+    const name = displayNickname.trim() || "My Friend";
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Happy Birthday, ${name}! 🌷`,
+          text: `A special birthday surprise for you! Open your envelope here:`,
+          url: shareUrl,
+        });
+      } catch {
+        // User cancelled or unsupported
+      }
+    } else {
+      copy();
+    }
+  };
+
+  const displayNickname = data.nickname === "Custom" ? data.customNickname : data.nickname;
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+    `Happy Birthday, ${displayNickname.trim() || "friend"}! 🌷 A special surprise made just for you:\n${shareUrl}`
+  )}`;
+
+  return (
+    <div className="mx-auto mt-9 w-full max-w-xl rounded-3xl border border-rose-deep/20 bg-cream/95 p-5 text-left shadow-xl shadow-rose/10 backdrop-blur-md sm:p-7">
+      <div className="flex items-start gap-3">
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-rose-deep text-lg text-cream shadow-sm">
+          💌
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-display text-lg font-bold text-ink sm:text-xl">
+            Share Your Birthday Surprise Link
+          </h3>
+          <p className="mt-1 text-xs leading-relaxed text-ink-soft sm:text-sm">
+            Your customized words, sender name, and balloon wishes are bundled into this link. Anyone opening it will receive your personalized gift!
+          </p>
+        </div>
+      </div>
+
+      {/* Auto-open option */}
+      <div className="mt-4 flex items-center justify-between rounded-xl border border-ink/10 bg-white/70 px-4 py-2.5">
+        <label htmlFor="auto-open-toggle" className="cursor-pointer text-xs font-semibold text-ink">
+          Open directly to envelope animation ✉️
+        </label>
+        <input
+          id="auto-open-toggle"
+          type="checkbox"
+          checked={autoOpen}
+          onChange={e => setAutoOpen(e.target.checked)}
+          className="size-4 cursor-pointer accent-rose-deep"
+        />
+      </div>
+
+      {/* Link box with Copy Button */}
+      <div className="mt-3 flex items-center gap-2">
+        <input
+          type="text"
+          readOnly
+          value={shareUrl}
+          className="field flex-1 truncate bg-white/90 px-3 py-2.5 text-xs text-ink"
+          onClick={e => (e.target as HTMLInputElement).select()}
+        />
+        <button
+          type="button"
+          onClick={copy}
+          className="focus-ring inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-rose-deep px-4 text-xs font-semibold text-cream shadow-sm transition-all hover:opacity-90 active:scale-95"
+        >
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+          <span>{copied ? "Copied! 🌷" : "Copy Link"}</span>
+        </button>
+      </div>
+
+      {/* Quick Share buttons */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={shareNative}
+          className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white/80 px-3.5 py-1.5 text-xs font-medium text-ink transition-colors hover:bg-white"
+        >
+          <Share2 size={13} className="text-rose-deep" />
+          <span>Share via App</span>
+        </button>
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-green-500/30 bg-green-50/80 px-3.5 py-1.5 text-xs font-medium text-green-700 transition-colors hover:bg-green-100/80"
+        >
+          <span>💬 WhatsApp</span>
+        </a>
+      </div>
+
+      {copied && (
+        <p className="mt-2.5 text-xs font-semibold text-rose-deep">
+          ✨ Link copied to clipboard! Send it to them on WhatsApp, iMessage, or Instagram.
+        </p>
+      )}
+    </div>
+  );
 }
 
 export function SettingsPanel({ open, data, setData, onClose }: { open: boolean; data: Personalization; setData: (data: Personalization) => void; onClose: () => void }) {
@@ -99,10 +220,23 @@ export function AestheticBirthdayCard({
   data: Personalization;
   onOpenSurprise: () => void;
 }) {
+  const [copied, setCopied] = useState(false);
   const displayNickname = data.nickname === "Custom" ? data.customNickname : data.nickname;
   const displayName = displayNickname.trim() || "My Favorite Human";
   const sender = data.senderName.trim() || "Your Friend";
   const note = data.note.trim() || "Happy Birthday! Wishing you all the sweetest moments, brightest days, and pure happiness today and always. 🌷✨";
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = encodePersonalizationToUrl(data, true);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    } catch {
+      // fallback
+    }
+  };
 
   return (
     <section className="flex w-full flex-col items-center">
@@ -137,7 +271,7 @@ export function AestheticBirthdayCard({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-rose-deep/15 bg-white/70 p-4 shadow-sm backdrop-blur-[3px]"
+              className="rounded-2xl border border-rose-deep/15 bg-white/75 p-4 shadow-sm backdrop-blur-[3px]"
             >
               <p className="font-display text-lg font-bold text-[#2D2226] sm:text-xl">
                 Dear <span className="text-rose-deep">{displayName}</span>,
@@ -170,8 +304,8 @@ export function AestheticBirthdayCard({
             )}
           </div>
 
-          {/* Bottom Interactive Tap-to-Open Callout */}
-          <div className="pb-1 text-center">
+          {/* Bottom Interactive Actions */}
+          <div className="space-y-2 pb-1 text-center">
             <button
               type="button"
               onClick={onOpenSurprise}
@@ -180,9 +314,16 @@ export function AestheticBirthdayCard({
               <span>Tap to Open Surprise</span>
               <span className="transition-transform group-hover/btn:translate-x-1">💌</span>
             </button>
-            <p className="mt-2 text-[10px] uppercase tracking-widest text-[#6E585E]">
-              Interactive Envelope • Wishes • Balloons
-            </p>
+            <div>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="focus-ring inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-ink-soft shadow-xs backdrop-blur-xs transition-colors hover:bg-white hover:text-ink"
+              >
+                {copied ? <Check size={12} className="text-rose-deep" /> : <Copy size={12} />}
+                <span>{copied ? "Link Copied! 🌷" : "Copy shareable link"}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -195,6 +336,7 @@ export function AestheticBirthdayCard({
 
 export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { data: Personalization; setData: (data: Personalization) => void; onCreate: () => void; onOpenSettings: () => void }) {
   const [error, setError] = useState("");
+  const [copiedLink, setCopiedLink] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const displayNickname = data.nickname === "Custom" ? data.customNickname : data.nickname;
 
@@ -204,6 +346,17 @@ export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { dat
     setError("");
     Promise.all(files.map(file => new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = reject; reader.readAsDataURL(file); }))).then(photos => setData({ ...data, photos: [...data.photos, ...photos].slice(0, 2) })).catch(() => setError("One of those photos could not be read."));
     event.target.value = "";
+  };
+
+  const copyDirectLink = async () => {
+    const url = encodePersonalizationToUrl(data, true);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 3000);
+    } catch {
+      // fallback
+    }
   };
 
   const submit = (event: React.FormEvent) => {
@@ -229,7 +382,7 @@ export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { dat
           </h1>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-soft sm:text-base">
             Inspired by pink tulips, handmade textured parchment, and delicate bows.
-            Personalize your card below, then tap to reveal the full interactive surprise!
+            Type your message below and send your personalized link to your friend!
           </p>
         </div>
 
@@ -353,10 +506,18 @@ export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { dat
           </AppButton>
           <button
             type="button"
-            onClick={onOpenSettings}
-            className="focus-ring inline-flex min-h-12 items-center gap-2 rounded-full border border-ink/10 bg-cream/80 px-5 text-xs font-semibold text-ink-soft hover:text-ink hover:border-ink/20"
+            onClick={copyDirectLink}
+            className="focus-ring inline-flex min-h-12 items-center gap-2 rounded-full border border-rose-deep/20 bg-rose/10 px-5 text-xs font-bold text-rose-deep transition-all hover:bg-rose/20 active:scale-95"
           >
-            <Settings size={15} /> Customize Balloon Wishes
+            {copiedLink ? <Check size={15} /> : <Share2 size={15} />}
+            <span>{copiedLink ? "Link Copied! 🌷" : "Copy Share Link"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className="focus-ring inline-flex min-h-12 items-center gap-2 rounded-full border border-ink/10 bg-cream/80 px-5 text-xs font-semibold text-ink-soft hover:border-ink/20 hover:text-ink"
+          >
+            <Settings size={15} /> Balloon Wishes
           </button>
         </div>
       </form>
@@ -393,5 +554,35 @@ export function BalloonSection({ messages, onComplete, sound }: { messages: stri
 
 export function FinalSurprise({ data, onReplay, sound }: { data: Personalization; onReplay: () => void; sound: boolean }) {
   useEffect(() => { if (sound) playTone("final"); }, [sound]);
-  return <div className="relative max-w-2xl text-center"><FloatingParticles celebration/><CuteSticker src={catTulipsSticker} alt="A cat offering pink tulips" className="absolute -left-10 top-16 size-32 sm:-left-32 sm:size-44" /><CuteSticker src={envelopeHeartSticker} alt="A tiny sealed love letter" className="absolute -right-4 top-2 size-20 sm:-right-24 sm:size-28" delay={.3} /><p className="eyebrow">One last thing…</p><motion.div className="mx-auto mt-8 grid size-36 place-items-center rounded-full bg-blush/70 text-6xl shadow-2xl shadow-rose/30" animate={{ scale: [1, 1.08, 1] }} transition={{ repeat: Infinity, duration: 2 }}>🎂</motion.div><h1 className="mt-8 font-display text-5xl sm:text-7xl">{surpriseConfig.finalLead}</h1><p className="mx-auto mt-7 max-w-xl whitespace-pre-wrap text-lg leading-relaxed text-ink-soft">{data.note}</p><p className="mt-7 font-display text-2xl italic text-wine">{surpriseConfig.finalThanks} <span aria-hidden="true">♥</span></p><AppButton onClick={onReplay} className="mt-10"><RotateCcw size={16}/> Replay the Surprise</AppButton></div>;
+  return (
+    <div className="relative w-full max-w-2xl text-center">
+      <FloatingParticles celebration />
+      <CuteSticker src={catTulipsSticker} alt="A cat offering pink tulips" className="absolute -left-10 top-16 size-32 sm:-left-32 sm:size-44" />
+      <CuteSticker src={envelopeHeartSticker} alt="A tiny sealed love letter" className="absolute -right-4 top-2 size-20 sm:-right-24 sm:size-28" delay={.3} />
+      <p className="eyebrow">One last thing…</p>
+      <motion.div
+        className="mx-auto mt-8 grid size-36 place-items-center rounded-full bg-blush/70 text-6xl shadow-2xl shadow-rose/30"
+        animate={{ scale: [1, 1.08, 1] }}
+        transition={{ repeat: Infinity, duration: 2 }}
+      >
+        🎂
+      </motion.div>
+      <h1 className="mt-8 font-display text-5xl sm:text-7xl">{surpriseConfig.finalLead}</h1>
+      <p className="mx-auto mt-7 max-w-xl whitespace-pre-wrap text-lg leading-relaxed text-ink-soft">
+        {data.note}
+      </p>
+      <p className="mt-7 font-display text-2xl italic text-wine">
+        {surpriseConfig.finalThanks} <span aria-hidden="true">♥</span>
+      </p>
+
+      {/* Share Box with encoded personalized words */}
+      <ShareCard data={data} />
+
+      <div className="mt-8 flex justify-center">
+        <AppButton onClick={onReplay}>
+          <RotateCcw size={16} /> Replay the Surprise
+        </AppButton>
+      </div>
+    </div>
+  );
 }

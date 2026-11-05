@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence } from "motion/react";
 import { Settings } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BalloonSection, Envelope, FinalSurprise, FloatingParticles, LandingScreen, Letter, MusicToggle, PhotoReveal, Progress, ScreenTransition, SettingsPanel, type Screen } from "../components/SurpriseUI";
 import { usePersistentPersonalization } from "../hooks/usePersistentPersonalization";
 
@@ -18,13 +18,21 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { value, setValue, ready } = usePersistentPersonalization();
+  const { value, setValue, ready, autoOpen, isFromSharedLink } = usePersistentPersonalization();
   const [screen, setScreen] = useState<Screen>("landing");
   const [sound, setSound] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
+
+  useEffect(() => {
+    if (ready && autoOpen) {
+      setScreen("envelope");
+    }
+  }, [ready, autoOpen]);
+
   if (!ready) return <div className="min-h-screen bg-background" />;
   const changeScreen = (next: Screen) => { setScreen(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
   return (
     <div className="mesh-bg relative min-h-screen overflow-x-hidden">
       <FloatingParticles />
@@ -56,6 +64,25 @@ function Index() {
           <MusicToggle />
         </div>
       </header>
+
+      {/* Sweet banner if visiting from a sender's personalized link */}
+      {isFromSharedLink && screen === "landing" && (
+        <div className="relative z-20 mx-auto max-w-xl px-5 pt-1">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-rose-deep/25 bg-white/80 p-3 shadow-md backdrop-blur-md">
+            <p className="text-xs font-semibold text-rose-deep">
+              💌 {value.senderName ? `${value.senderName} sent you this personalized birthday surprise!` : "You received a personalized birthday surprise!"}
+            </p>
+            <button
+              type="button"
+              onClick={() => changeScreen("envelope")}
+              className="focus-ring shrink-0 rounded-full bg-rose-deep px-4 py-1.5 text-xs font-bold text-cream shadow-sm hover:opacity-90 active:scale-95 transition-all"
+            >
+              Open Surprise ✉️
+            </button>
+          </div>
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         {screen === "landing" && <ScreenTransition screen={screen}><LandingScreen data={value} setData={setValue} onOpenSettings={() => setSettingsOpen(true)} onCreate={() => changeScreen("envelope")} /></ScreenTransition>}
         {screen === "envelope" && <ScreenTransition screen={screen}><Envelope sound={sound} onOpen={() => changeScreen("letter")} /></ScreenTransition>}
