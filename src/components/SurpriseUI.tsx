@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowRight, Check, Copy, ImagePlus, Music, Music2, RotateCcw, Save, Settings, Share2, Sparkles, X } from "lucide-react";
+import { ArrowRight, Check, Copy, ImagePlus, Music, Music2, RotateCcw, Save, Settings, Share2, Sparkles, X, Heart } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import blushingCatSticker from "../assets/blushing-cat-sticker.png";
 import catTulipsSticker from "../assets/cat-tulips-sticker.png";
@@ -79,7 +79,7 @@ export function ShareCard({ data }: { data: Personalization }) {
             Share Your Birthday Surprise Link
           </h3>
           <p className="mt-1 text-xs leading-relaxed text-ink-soft sm:text-sm">
-            Your customized words, sender name, and balloon wishes are bundled into this link. Anyone opening it will receive your personalized gift!
+            Your customized words, sender name, and balloon wishes are bundled into this link. <strong>The recipient can view and enjoy the surprise, but cannot edit your words!</strong>
           </p>
         </div>
       </div>
@@ -216,9 +216,11 @@ export function ScreenTransition({ screen, children }: { screen: Screen; childre
 export function AestheticBirthdayCard({
   data,
   onOpenSurprise,
+  isReceiver = false,
 }: {
   data: Personalization;
   onOpenSurprise: () => void;
+  isReceiver?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const displayNickname = data.nickname === "Custom" ? data.customNickname : data.nickname;
@@ -311,35 +313,104 @@ export function AestheticBirthdayCard({
               onClick={onOpenSurprise}
               className="focus-ring group/btn inline-flex items-center gap-2 rounded-full border border-rose-deep/20 bg-white/95 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-rose-deep shadow-md backdrop-blur-md transition-all hover:bg-rose-deep hover:text-white active:scale-95"
             >
-              <span>Tap to Open Surprise</span>
+              <span>{isReceiver ? "Open Your Surprise" : "Tap to Open Surprise"}</span>
               <span className="transition-transform group-hover/btn:translate-x-1">💌</span>
             </button>
-            <div>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="focus-ring inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-ink-soft shadow-xs backdrop-blur-xs transition-colors hover:bg-white hover:text-ink"
-              >
-                {copied ? <Check size={12} className="text-rose-deep" /> : <Copy size={12} />}
-                <span>{copied ? "Link Copied! 🌷" : "Copy shareable link"}</span>
-              </button>
-            </div>
+            {!isReceiver && (
+              <div>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="focus-ring inline-flex items-center gap-1 rounded-full bg-white/80 px-3 py-1 text-[11px] font-medium text-ink-soft shadow-xs backdrop-blur-xs transition-colors hover:bg-white hover:text-ink"
+                >
+                  {copied ? <Check size={12} className="text-rose-deep" /> : <Copy size={12} />}
+                  <span>{copied ? "Link Copied! 🌷" : "Copy shareable link"}</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
       <p className="mt-4 text-center text-xs text-ink-soft">
-        🌸 Live interactive card preview — updates as you type
+        {isReceiver
+          ? "🌷 A personalized birthday card made especially for you"
+          : "🌸 Live interactive card preview — updates as you type"}
       </p>
     </section>
   );
 }
 
-export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { data: Personalization; setData: (data: Personalization) => void; onCreate: () => void; onOpenSettings: () => void }) {
+export function LandingScreen({
+  data,
+  setData,
+  onCreate,
+  onOpenSettings,
+  isReceiver = false,
+  onCreateOwn,
+}: {
+  data: Personalization;
+  setData: (data: Personalization) => void;
+  onCreate: () => void;
+  onOpenSettings: () => void;
+  isReceiver?: boolean;
+  onCreateOwn?: () => void;
+}) {
   const [error, setError] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const displayNickname = data.nickname === "Custom" ? data.customNickname : data.nickname;
 
+  // Receiver-only view (read-only, no inputs or editing tools)
+  if (isReceiver) {
+    const displayName = displayNickname.trim() || "My Favorite Human";
+    const sender = data.senderName.trim() || "Someone special";
+
+    return (
+      <div className="mx-auto flex w-full max-w-2xl flex-col items-center justify-center space-y-6 py-4 text-center">
+        {/* Recipient Welcome Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-3 px-4"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-rose-deep/20 bg-rose/10 px-4 py-1.5 text-xs font-semibold text-rose-deep backdrop-blur-sm">
+            <span>🎀</span>
+            <span>A Birthday Surprise For You</span>
+            <span>🌷</span>
+          </div>
+          <h1 className="font-display text-4xl font-bold leading-tight text-ink sm:text-5xl lg:text-6xl">
+            Happy Birthday, <span className="text-rose-deep">{displayName}</span>!
+          </h1>
+          <p className="mx-auto max-w-md text-sm leading-relaxed text-ink-soft sm:text-base">
+            {sender} made a personalized birthday surprise just for you. Tap the card or button below to unfold your surprise!
+          </p>
+        </motion.div>
+
+        {/* The Aesthetic Card (Read-only view) */}
+        <div className="flex w-full justify-center">
+          <AestheticBirthdayCard data={data} onOpenSurprise={onCreate} isReceiver={true} />
+        </div>
+
+        {/* Receiver Actions */}
+        <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row">
+          <AppButton onClick={onCreate} className="w-full px-8 py-3.5 text-base sm:w-auto">
+            Open Your Surprise 💌 <Sparkles size={18} />
+          </AppButton>
+          {onCreateOwn && (
+            <button
+              type="button"
+              onClick={onCreateOwn}
+              className="focus-ring inline-flex min-h-12 items-center gap-2 rounded-full border border-ink/10 bg-cream/70 px-5 text-xs font-semibold text-ink-soft transition-all hover:bg-cream hover:text-ink"
+            >
+              Create one for a friend ✨
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Sender-view: full customization form + live card preview
   const onFiles = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []).slice(0, surpriseConfig.maxPhotos - data.photos.length);
     if (files.some(file => !file.type.startsWith("image/") || file.size > surpriseConfig.maxPhotoBytes)) { setError("Choose JPG, PNG, or WebP images under 1.5 MB each."); return; }
@@ -376,9 +447,9 @@ export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { dat
             <span>Aesthetic Birthday Card & Surprise</span>
             <span>🌷</span>
           </div>
-          <h1 className="mt-3 font-display text-4xl leading-[1.08] sm:text-5xl lg:text-6xl text-ink">
+          <h1 className="mt-3 font-display text-4xl leading-[1.08] text-ink sm:text-5xl lg:text-6xl">
             Happy Birthday! <br />
-            <em className="text-rose-deep italic">A little something for you.</em>
+            <em className="italic text-rose-deep">A little something for you.</em>
           </h1>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-soft sm:text-base">
             Inspired by pink tulips, handmade textured parchment, and delicate bows.
@@ -397,7 +468,7 @@ export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { dat
                 onClick={() => setData({ ...data, nickname })}
                 className={`focus-ring min-h-10 rounded-full border px-4 text-xs font-semibold transition-all ${
                   data.nickname === nickname
-                    ? "border-rose-deep bg-rose-deep text-cream shadow-sm scale-105"
+                    ? "scale-105 border-rose-deep bg-rose-deep text-cream shadow-sm"
                     : "border-ink/10 bg-cream/70 text-ink-soft hover:border-rose-deep/40"
                 }`}
               >
@@ -473,7 +544,7 @@ export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { dat
           <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={onFiles} />
           <div className="grid grid-cols-2 gap-3">
             {data.photos.map((photo, i) => (
-              <div key={photo.slice(-24)} className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-sm border border-rose-deep/10">
+              <div key={photo.slice(-24)} className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-rose-deep/10 shadow-sm">
                 <img src={photo} alt={`Memory ${i + 1}`} className="h-full w-full object-cover" />
                 <button
                   type="button"
@@ -524,7 +595,7 @@ export function LandingScreen({ data, setData, onCreate, onOpenSettings }: { dat
 
       {/* Aesthetic Card Component matching the Pinterest pin */}
       <div className="lg:sticky lg:top-24">
-        <AestheticBirthdayCard data={data} onOpenSurprise={onCreate} />
+        <AestheticBirthdayCard data={data} onOpenSurprise={onCreate} isReceiver={false} />
       </div>
     </div>
   );
@@ -552,7 +623,19 @@ export function BalloonSection({ messages, onComplete, sound }: { messages: stri
   return <div className="relative w-full max-w-5xl text-center"><CuteSticker src={ratHeartOutlineSticker} alt="A tiny friend sending a heart" className="absolute -right-3 -top-12 size-24 sm:right-4 sm:size-32 lg:-right-10" /><p className="eyebrow">A few small wishes</p><h1 className="mt-4 font-display text-4xl sm:text-6xl">Pop every balloon</h1><p className="mt-3 text-ink-soft">Each one holds a birthday wish.</p><div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">{messages.map((message, i) => { const isPopped = popped.includes(i); return <button key={`${i}-${message}`} type="button" onClick={() => pop(i)} disabled={isPopped} className="focus-ring relative flex min-h-44 items-center justify-center" aria-label={isPopped ? message : `Pop balloon ${i + 1}`}><AnimatePresence mode="wait">{isPopped ? <motion.p key="message" initial={{ opacity: 0, scale: .7 }} animate={{ opacity: 1, scale: 1 }} className="font-display text-lg italic leading-snug text-wine">{message}</motion.p> : <motion.span key="balloon" className={`balloon balloon-${i % 4}`} animate={{ y: [0, -9, 0], rotate: [0, i % 2 ? 2 : -2, 0] }} exit={{ scale: 1.35, opacity: 0 }} transition={{ y: { duration: 3 + i * .12, repeat: Infinity, delay: i * .1 }, rotate: { duration: 3 + i * .12, repeat: Infinity, delay: i * .1 }, scale: { duration: .25 }, opacity: { duration: .25 } }}><span className="balloon-shine"/><span className="balloon-string"/></motion.span>}</AnimatePresence></button>; })}</div><p className="mt-7 text-sm tabular-nums text-ink-soft">{popped.length} of {messages.length} opened</p></div>;
 }
 
-export function FinalSurprise({ data, onReplay, sound }: { data: Personalization; onReplay: () => void; sound: boolean }) {
+export function FinalSurprise({
+  data,
+  onReplay,
+  sound,
+  isReceiver = false,
+  onCreateOwn,
+}: {
+  data: Personalization;
+  onReplay: () => void;
+  sound: boolean;
+  isReceiver?: boolean;
+  onCreateOwn?: () => void;
+}) {
   useEffect(() => { if (sound) playTone("final"); }, [sound]);
   return (
     <div className="relative w-full max-w-2xl text-center">
@@ -575,8 +658,30 @@ export function FinalSurprise({ data, onReplay, sound }: { data: Personalization
         {surpriseConfig.finalThanks} <span aria-hidden="true">♥</span>
       </p>
 
-      {/* Share Box with encoded personalized words */}
-      <ShareCard data={data} />
+      {/* If sender: show share box with copy/send tools. If receiver: show warm closing message & create-own option */}
+      {!isReceiver ? (
+        <ShareCard data={data} />
+      ) : (
+        <div className="mx-auto mt-8 max-w-md rounded-3xl border border-rose-deep/15 bg-white/75 p-6 shadow-sm backdrop-blur-md">
+          <p className="font-display text-lg font-bold text-ink">
+            Hope your birthday is filled with pure joy and beautiful moments! 🌷✨
+          </p>
+          <p className="mt-1 text-xs text-ink-soft">
+            From {data.senderName || "your friend"}, with love.
+          </p>
+          {onCreateOwn && (
+            <div className="mt-5 border-t border-ink/10 pt-4">
+              <button
+                type="button"
+                onClick={onCreateOwn}
+                className="focus-ring inline-flex items-center gap-1.5 rounded-full bg-rose-deep/10 px-4 py-2 text-xs font-semibold text-rose-deep transition-colors hover:bg-rose-deep/20"
+              >
+                <span>Want to make one for a friend? Click here 💌</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mt-8 flex justify-center">
         <AppButton onClick={onReplay}>

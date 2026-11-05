@@ -30,6 +30,13 @@ function Index() {
     }
   }, [ready, autoOpen]);
 
+  const handleCreateOwn = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.history.replaceState({}, "", window.location.pathname);
+      window.location.reload();
+    }
+  }, []);
+
   if (!ready) return <div className="min-h-screen bg-background" />;
   const changeScreen = (next: Screen) => { setScreen(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
@@ -45,15 +52,18 @@ function Index() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSettingsOpen(true)}
-            aria-label="Open surprise settings"
-            title="Surprise settings"
-            className="focus-ring grid size-11 place-items-center rounded-full border border-ink/10 bg-cream/80 text-ink-soft backdrop-blur-md hover:text-ink hover:border-ink/20 transition-colors"
-          >
-            <Settings size={17} />
-          </button>
+          {/* Only the sender can open settings. For receivers who opened a shared link, hide the settings button completely! */}
+          {!isFromSharedLink && (
+            <button
+              type="button"
+              onClick={() => setSettingsOpen(true)}
+              aria-label="Open surprise settings"
+              title="Surprise settings"
+              className="focus-ring grid size-11 place-items-center rounded-full border border-ink/10 bg-cream/80 text-ink-soft backdrop-blur-md hover:text-ink hover:border-ink/20 transition-colors"
+            >
+              <Settings size={17} />
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setSound(!sound)}
@@ -84,14 +94,38 @@ function Index() {
       )}
 
       <AnimatePresence mode="wait">
-        {screen === "landing" && <ScreenTransition screen={screen}><LandingScreen data={value} setData={setValue} onOpenSettings={() => setSettingsOpen(true)} onCreate={() => changeScreen("envelope")} /></ScreenTransition>}
+        {screen === "landing" && (
+          <ScreenTransition screen={screen}>
+            <LandingScreen
+              data={value}
+              setData={setValue}
+              onOpenSettings={() => setSettingsOpen(true)}
+              onCreate={() => changeScreen("envelope")}
+              isReceiver={isFromSharedLink}
+              onCreateOwn={handleCreateOwn}
+            />
+          </ScreenTransition>
+        )}
         {screen === "envelope" && <ScreenTransition screen={screen}><Envelope sound={sound} onOpen={() => changeScreen("letter")} /></ScreenTransition>}
         {screen === "letter" && <ScreenTransition screen={screen}><Letter data={value} onNext={() => changeScreen("photos")} /></ScreenTransition>}
         {screen === "photos" && <ScreenTransition screen={screen}><PhotoReveal photos={value.photos} onNext={() => changeScreen("balloons")} /></ScreenTransition>}
         {screen === "balloons" && <ScreenTransition screen={screen}><BalloonSection messages={value.balloonMessages} sound={sound} onComplete={() => changeScreen("final")} /></ScreenTransition>}
-        {screen === "final" && <ScreenTransition screen={screen}><FinalSurprise data={value} sound={sound} onReplay={() => changeScreen("landing")} /></ScreenTransition>}
+        {screen === "final" && (
+          <ScreenTransition screen={screen}>
+            <FinalSurprise
+              data={value}
+              sound={sound}
+              onReplay={() => changeScreen("landing")}
+              isReceiver={isFromSharedLink}
+              onCreateOwn={handleCreateOwn}
+            />
+          </ScreenTransition>
+        )}
       </AnimatePresence>
-      <SettingsPanel open={settingsOpen} data={value} setData={setValue} onClose={closeSettings} />
+
+      {!isFromSharedLink && (
+        <SettingsPanel open={settingsOpen} data={value} setData={setValue} onClose={closeSettings} />
+      )}
       <Progress screen={screen} />
     </div>
   );
