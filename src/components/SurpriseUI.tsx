@@ -13,9 +13,11 @@ import { playTone, startAmbient } from "../utils/audio";
 import { encodePersonalizationToUrl } from "../utils/share";
 import { AiDraftHelper } from "./AiDraftHelper";
 
-export type Screen = "landing" | "envelope" | "letter" | "photos" | "balloons" | "final";
+export type Screen = "cake" | "landing" | "envelope" | "letter" | "photos" | "balloons" | "final";
 
-const screenOrder: Screen[] = ["landing", "envelope", "letter", "photos", "balloons", "final"];
+const screenOrder: Screen[] = ["cake", "envelope", "letter", "photos", "balloons", "final"];
+
+export { BirthdayCakeScreen } from "./BirthdayCakeScreen";
 
 function CuteSticker({ src, alt, className = "", delay = 0 }: { src: string; alt: string; className?: string; delay?: number }) {
   const reduced = useReducedMotion();
@@ -204,8 +206,15 @@ export function MusicToggle() {
 }
 
 export function Progress({ screen }: { screen: Screen }) {
+  if (screen === "landing") return null;
   const active = screenOrder.indexOf(screen);
-  return <div className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-cream/65 px-4 py-2 backdrop-blur-md" aria-label={`Step ${active + 1} of ${screenOrder.length}`}>{screenOrder.map((item, i) => <span key={item} className={`h-1 rounded-full transition-all ${i === active ? "w-6 bg-rose-deep" : i < active ? "w-2 bg-rose" : "w-2 bg-ink/15"}`} />)}</div>;
+  return (
+    <div className="fixed bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-cream/65 px-4 py-2 backdrop-blur-md" aria-label={`Step ${active + 1} of ${screenOrder.length}`}>
+      {screenOrder.map((item, i) => (
+        <span key={item} className={`h-1 rounded-full transition-all ${i === active ? "w-6 bg-rose-deep" : i < active ? "w-2 bg-rose" : "w-2 bg-ink/15"}`} />
+      ))}
+    </div>
+  );
 }
 
 export function ScreenTransition({ screen, children }: { screen: Screen; children: ReactNode }) {
@@ -575,6 +584,13 @@ export function LandingScreen({
           <AppButton type="submit" className="flex-1 sm:flex-initial">
             Open Surprise 💌 <Sparkles size={16} />
           </AppButton>
+          <button
+            type="button"
+            onClick={onCreate}
+            className="focus-ring inline-flex min-h-12 items-center gap-2 rounded-full border border-rose-deep/30 bg-white/90 px-5 text-xs font-bold text-rose-deep shadow-sm hover:bg-rose-deep/10 active:scale-95 transition-all"
+          >
+            <span>🎂 Preview Cake & Candles</span>
+          </button>
           <button
             type="button"
             onClick={copyDirectLink}

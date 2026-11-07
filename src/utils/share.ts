@@ -1,12 +1,12 @@
 import type { Personalization } from "../config/surprise";
 
 export type EncodedPayload = {
-  n?: string; // nickname
-  c?: string; // custom nickname
-  s?: string; // sender
-  m?: string; // message note
-  b?: string[]; // balloon messages
-  o?: number; // auto-open to envelope (1 = yes)
+  n?: string | undefined;
+  c?: string | undefined;
+  s?: string | undefined;
+  m?: string | undefined;
+  b?: string[] | undefined;
+  o?: number | undefined;
 };
 
 export function encodePersonalizationToUrl(p: Personalization, autoOpen = false): string {
@@ -72,7 +72,7 @@ export function decodePersonalizationFromUrl(search: string): { data: Partial<Pe
           customNickname: parsed.c || "",
           senderName: parsed.s || "",
           note: parsed.m || "",
-          balloonMessages: Array.isArray(parsed.b) && parsed.b.length ? parsed.b : undefined,
+          ...(Array.isArray(parsed.b) && parsed.b.length ? { balloonMessages: parsed.b } : {}),
         },
         autoOpen: Boolean(parsed.o),
       };
